@@ -69,6 +69,6 @@ app.use(function (err, req, res, next) {
   res.render('error')
 })
 
-app.listen(PORT, () => console.log(`🚀 App listening on port ${PORT}`))
+app.listen(PORT, () => console.log(`🚀 App listening on port ${process.env.HOST}`))
 
 export default app
