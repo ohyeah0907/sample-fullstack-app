@@ -47,8 +47,6 @@ app.use('/api/users', userRouter)
 app.use('/api/customers', customerRouter)
 app.use('/api/uploads', uploadRouter)
 
-console.log('hello');
-
 app.get('/*', function (req, res) {
   NODE_ENV === 'development'
     ? res.render('index', { title: 'Express' })
