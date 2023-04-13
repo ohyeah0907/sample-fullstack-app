@@ -16,23 +16,21 @@ function Search(props) {
   const { onChange } = props
 
   const [value, setValue] = useState(props.value)
-  console.log(' :>> ', value);
 
   const handleSearch = (_value) => {
     setValue(_value)
-    if (window.__searchTimeout) clearTimeout(window.__searchTimeout)
-    window.__searchTimeout = window.setTimeout(() => onChange(_value), 500)
+    if (window.__searchTimeOut) clearTimeout(window.__searchTimeOut)
+    window.__searchTimeOut = setTimeout(() => onChange(_value), 500)
   }
-
   return (
     <TextField
-      label="Search"
-      placeholder="search"
-      value={value}
-      onChange={handleSearch}
-      autoComplete="off"
-      clearButton
-      onClearButtonClick={() => handleSearch('')}
+        label="Search"
+        placeholder='search'
+        value={value}
+        onChange={handleSearch}
+        autoComplete='off'
+        clearButton
+        onClearButtonClick={() => handleSearch('')}
     />
   )
 }

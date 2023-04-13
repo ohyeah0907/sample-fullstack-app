@@ -1,4 +1,4 @@
-import Model from '../models/country.js'
+import Model from '../models/post.js'
 import ErrorCodes from '../constants/errorCodes.js'
 import generatePagination from '../helpers/generatePagination.js'
 import { Op } from 'sequelize'
@@ -6,23 +6,19 @@ import { Op } from 'sequelize'
 const getAll = async (where) => {
   let items = [],
     page = 1
-
   let _where = where || {}
-
   const count = await Model.count({ where: _where })
 
-  while (page >= 1) {
+  while (page > 1) {
     let filter = {
       where: _where,
       limit: 100,
       offset: (page - 1) * 100,
-      order: [['updatedAt', 'DESC']],
+      order: [['updateAt', 'DESC']],
     }
-
     let res = await Model.findAll(filter)
 
     items = items.concat(res)
-
     page = items.length >= count ? -1 : page + 1
   }
 
@@ -33,19 +29,34 @@ const count = async (where) => {
   return await Model.count(where)
 }
 
-const find = async ({ page, limit, where, search }) => {
+const find = async ({ page, limit, where, search, publish, status }) => {
   let _page = page >= 1 ? page : 1
   let _limit = limit >= 1 && limit <= 100 ? limit : 20
 
-  console.log(_limit)
   let _where = where || {}
   if (search) {
     _where = {
       ..._where,
-      name: { [Op.iLike]: `%${search}%` },
+      [Op.or]: [
+        { title: { [Op.like]: `%${search}%` } },
+        { title: { [Op.iLike]: `%${search}%` } },
+        { description: { [Op.like]: `%${search}%` } },
+        { description: { [Op.iLike]: `%${search}%` } },
+      ],
     }
   }
-
+  if ('' + publish == 'true' || '' + publish == 'false') {
+    _where = {
+      ..._where,
+      publish,
+    }
+  }
+  if (['ACTIVE', 'DRAFT', 'ARCHIVED'].includes(status?.toUpperCase())) {
+    _where = {
+      ..._where,
+      status: status?.toUpperCase(),
+    }
+  }
   let filter = {
     where: _where,
     limit: _limit,
@@ -63,7 +74,7 @@ const find = async ({ page, limit, where, search }) => {
 }
 
 const findById = async (id) => {
-  const entry = await Model.findOne({ where: { id } })
+  const entry = await Model.findByPk(id)
   if (!entry) {
     throw new Error(ErrorCodes.NOT_FOUND)
   }
@@ -78,20 +89,22 @@ const create = async (data) => {
 }
 
 const update = async (id, data) => {
-  const updated = await Model.update(data, { where: { id }, returning: true, plain: true })
+  const updated = await Model.update(data, { where: { id }, returning: true })
 
   return updated[1].toJSON()
 }
 
 const _delete = async (id) => {
-  return await Model.destroy({ where: { id } })
+  const deleted = await Model.destroy({ where: { id } })
+
+  return deleted
 }
 
 export default {
   getAll,
-  count,
   find,
   findById,
+  count,
   create,
   update,
   delete: _delete,

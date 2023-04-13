@@ -17,10 +17,9 @@ const Model = PostgresSequelize.define('countries', {
 
 Model.prototype.toJSON = function () {
   let values = Object.assign({}, this.get())
-
   return values
 }
 
-Model.sync()
+Model.sync({force: true})
 
 export default Model

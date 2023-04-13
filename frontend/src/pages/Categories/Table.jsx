@@ -1,23 +1,20 @@
-import PropTypes from 'prop-types'
 import {
   ActionList,
   Button,
   DataTable,
-  Popover,
-  LegacyStack,
   LegacyCard,
+  LegacyStack,
   Pagination,
+  Popover,
   Select,
 } from '@shopify/polaris'
+import PropTypes from 'prop-types'
 import { MobileVerticalDotsMajor } from '@shopify/polaris-icons'
-import qs from 'query-string'
-import { useEffect, useState } from 'react'
-import CountryApi from '../../apis/country'
 import ConfirmModal from '../../components/ConfirmModal'
 import Search from './Search'
+import { useState } from 'react'
 
 Table.propTypes = {
-  // ...appProps,
   data: PropTypes.object,
   onChangePage: PropTypes.func,
   onChangeLimit: PropTypes.func,
@@ -43,10 +40,9 @@ function Table(props) {
 
   const [selected, setSelected] = useState(null)
   const [deleted, setDeleted] = useState(null)
-  
-  console.log(selected)
 
   let rows = []
+
   if (items?.length > 0) {
     rows = items.map((item, index) => [
       (page - 1) * limit + index + 1,
@@ -59,9 +55,7 @@ function Table(props) {
           activator={
             <Button
               plain
-              onClick={() => { 
-                setSelected(selected?.id === item.id ? null : item)
-              }}
+              onClick={() => setSelected(selected?.id === item.id ? null : item)}
               icon={MobileVerticalDotsMajor}
             />
           }
@@ -70,14 +64,8 @@ function Table(props) {
           <ActionList
             actionRole="menuitem"
             items={[
-              {
-                content: 'Edit',
-                onAction: () => setSelected(null) & onEdit(item),
-              },
-              {
-                content: 'Delete',
-                onAction: () => setSelected(null) & setDeleted(item),
-              },
+              { content: 'Edit', onAction: () => setSelected(null) & onEdit(item) },
+              { content: 'Delete', onAction: () => setDeleted(item) },
             ]}
           />
         </Popover>
@@ -88,15 +76,15 @@ function Table(props) {
   return (
     <LegacyStack vertical alignment="fill">
       <LegacyCard sectioned>
-        <Search value={search} onChange={onSearch} />
+        <Search value={search} onChange={onSearch}/>
       </LegacyCard>
-      
+
       <div>Total items: {totalItems || 'loading...'}</div>
 
       <LegacyCard sectioned>
         <DataTable
-          headings={['No.', 'Name', 'Actions']}
           columnContentTypes={['text', 'text', 'numeric']}
+          headings={['No.', 'Name', 'Actions']}
           rows={rows}
           footerContent={items ? (items?.length > 0 ? undefined : 'Have no data') : 'loading..'}
         />
@@ -111,9 +99,11 @@ function Table(props) {
               onNext={() => onChangePage(page + 1)}
             />
             <Select
-              options={[5, 10, 15, 100].map((item) => ({ label: '' + item, value: '' + item }))}
+              options={[10, 20, 50, 100].map((item) => ({ label: '' + item, value: '' + item }))}
               value={'' + limit}
-              onChange={(index) => {onChangeLimit(page, limit, index)}}
+              onChange={(index) => {
+                onChangeLimit(page, limit, index)
+              }}
             />
           </LegacyStack>
         </LegacyCard.Section>
@@ -140,5 +130,4 @@ function Table(props) {
     </LegacyStack>
   )
 }
-
 export default Table

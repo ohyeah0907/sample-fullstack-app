@@ -18,7 +18,7 @@ const apiCaller = async (endpoint, method = 'GET', data = undefined, extraHeader
       success: false,
       error: {
         message: error.response?.data?.error?.message || error.message,
-        code: error.response?.data?.error?.code || undefined,
+        code: error.response?.data?.error?.code || undefined, //note
       },
     }
   }

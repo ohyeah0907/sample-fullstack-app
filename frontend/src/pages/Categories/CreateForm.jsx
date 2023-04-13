@@ -3,10 +3,9 @@ import { Button, LegacyCard, LegacyStack } from '@shopify/polaris'
 import { useEffect, useState } from 'react'
 import ValidateForm from '../../helpers/validateForm'
 import FormControl from '../../components/FormControl'
-import CountryApi from '../../apis/country'
+import CategoryApi from '../../apis/category'
 
 CreateForm.propTypes = {
-  // ...appProps,
   created: PropTypes.object,
 }
 
@@ -37,29 +36,28 @@ function CreateForm(props) {
 
   const [formData, setFormData] = useState(null)
 
-  useEffect(() => console.log('formData :>> ', formData), [formData])
+  useEffect(() => console.log('formData :>>', formData), [formData])
 
   useEffect(() => {
-    // Cloning an object 
-    // let _formData = JSON.parse(JSON.stringify(InitFormData))
-    let _formData = {...InitFormData}
+    let _formData = JSON.parse(JSON.stringify(InitFormData))
 
     if (created.id) {
-      Array.from(['name']).forEach(
+      Array.from([]).foreach(
         (field) => (_formData[field] = { ..._formData[field], value: created[field] || '' })
       )
     }
-    
+
     setFormData(_formData)
   }, [])
 
   const handleChange = (name, value) => {
-    let _formData = JSON.parse(JSON.stringify(formData))
+    // let _formData = JSON.parse(JSON.stringify(formData))
+    let _formData = { ...formData }
     _formData[name] = { ..._formData[name], value, error: '' }
     setFormData(_formData)
   }
 
-  const handleDiscard = () => props.navigate('countries')
+  const handleDiscard = () => props.navigate('categories')
 
   const handleSubmit = async () => {
     try {
@@ -79,16 +77,16 @@ function CreateForm(props) {
       let res = null
       if (created.id) {
         // update
-        res = await CountryApi.update(created.id, data)
+        res = await CategoryApi.update(created.id, data)
       } else {
         // create
-        res = await CountryApi.create(data)
+        res = await CategoryApi.create(data)
       }
       if (!res.success) throw res.error
 
       actions.showNotify({ message: created.id ? 'Saved' : 'Created' })
 
-      props.navigate(`countries/${res.data.id}`)
+      props.navigate(`categories/${res.data.id}`)
     } catch (error) {
       console.log(error)
       actions.showNotify({ error: true, message: error.message })
@@ -97,7 +95,7 @@ function CreateForm(props) {
     }
   }
 
-  if (!formData) return null
+  if(!formData) return null
 
   return (
     <LegacyStack vertical alignment="fill">

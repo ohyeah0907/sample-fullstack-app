@@ -8,6 +8,10 @@ import Customer from './pages/Customers'
 import CustomerNew from './pages/Customers/new'
 import CustomerDetail from './pages/Customers/[id]'
 
+import Category from './pages/Categories'
+import CategoryNew from './pages/Categories/new'
+import CategoryDetail from './pages/Categories/[id]'
+
 export default [
   {
     path: '/',
@@ -60,4 +64,19 @@ export default [
       },
     ],
   },
+  {
+    path: '/categories',
+    title: 'Categories',
+    exact: true,
+    component: Category,
+    childrens: [
+      {
+        path: '/categories/new',
+        title: 'New category',
+        exact: true,
+        component: CategoryNew,
+        childrens: [],
+      }
+    ]
+  }
 ]

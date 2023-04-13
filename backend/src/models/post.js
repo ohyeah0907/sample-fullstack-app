@@ -43,6 +43,6 @@ const Model = PostgresSequelize.define('posts', {
 
 Model.belongsTo(CategoryModel)
 
-Model.sync()
+Model.sync({ force: true })
 
 export default Model

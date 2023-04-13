@@ -7,7 +7,6 @@ Header.propTypes = {
   actions: PropTypes.array,
   onBack: PropTypes.func,
 }
-
 Header.defaultProps = {
   title: '',
   actions: [],

@@ -62,12 +62,15 @@ function IndexPage(props) {
           },
         ]}
       />
-
       <Table
         {...props}
         data={countries}
         onChangePage={(page) => getCountries({ page, limit, search })}
-        onChangeLimit={(limit) => getCountries({ page: 1, limit, search })}
+        onChangeLimit={(oldPage, oldLimit, newLimit) => {
+          const oldIndex = (oldPage - 1) * oldLimit
+          const newIndex = Math.floor(oldIndex / newLimit) + 1
+          getCountries({ page: newIndex, limit: newLimit, search })
+        }}
         search={search}
         onSearch={(search) => getCountries({ page: 1, limit, search })}
         onEdit={(item) => props.navigate(`countries/${item.id}`)}

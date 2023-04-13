@@ -92,6 +92,6 @@ Model.prototype.toJSON = function () {
 
 Model.belongsTo(CountryModel)
 
-Model.sync()
+Model.sync({force: true})
 
 export default Model

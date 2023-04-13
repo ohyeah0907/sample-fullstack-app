@@ -13,7 +13,6 @@ export const getCountries = async (dispatch) => {
   try {
     let res = await CountryApi.getAll()
     if (!res.success) throw res.error
-
     return dispatch(slices.countries.actions.setData(res.data))
   } catch (error) {
     dispatch(slices.notify.actions.showNotify({ message: error.message, error: true }))
