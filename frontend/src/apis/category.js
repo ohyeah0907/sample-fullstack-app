@@ -10,4 +10,4 @@ const CategoryApi = {
   delete: async (id) => await apiCaller(`categories/${id}`, 'DELETE'),
 }
 
-export default CategoryApi;
+export default CategoryApi

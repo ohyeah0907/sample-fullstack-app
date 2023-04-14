@@ -84,14 +84,14 @@ const findById = async (id) => {
 
 const create = async (data) => {
   const created = await Model.create(data)
-
+  console.log(created.toJSON())
   return created.toJSON()
 }
 
 const update = async (id, data) => {
   const updated = await Model.update(data, { where: { id }, returning: true })
-
-  return updated[1].toJSON()
+  console.log(updated)
+  return updated[1]
 }
 
 const _delete = async (id) => {

@@ -42,11 +42,10 @@ function CreateForm(props) {
     let _formData = JSON.parse(JSON.stringify(InitFormData))
 
     if (created.id) {
-      Array.from([]).foreach(
+      Array.from(['name']).forEach(
         (field) => (_formData[field] = { ..._formData[field], value: created[field] || '' })
       )
     }
-
     setFormData(_formData)
   }, [])
 

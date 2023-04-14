@@ -29,6 +29,7 @@ function IndexPage(props) {
   }
 
   useEffect(() => {
+    console.log(page)
     getCountries({ page, limit, search })
   }, [])
 

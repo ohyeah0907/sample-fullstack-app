@@ -1,31 +1,20 @@
-import PropTypes from 'prop-types'
 import {
-  ActionList,
-  Button,
   DataTable,
-  Popover,
-  LegacyStack,
-  LegacyCard,
   Pagination,
+  ActionList,
+  Popover,
+  LegacyCard,
+  LegacyStack,
   Select,
+  Thumbnail,
+  Button,
 } from '@shopify/polaris'
-import { MobileVerticalDotsMajor } from '@shopify/polaris-icons'
-import qs from 'query-string'
-import { useEffect, useState } from 'react'
-import CountryApi from '../../apis/country'
-import ConfirmModal from '../../components/ConfirmModal'
 import Search from './Search'
-
-Table.propTypes = {
-  // ...appProps,
-  data: PropTypes.object,
-  onChangePage: PropTypes.func,
-  onChangeLimit: PropTypes.func,
-  search: PropTypes.string,
-  onSearch: PropTypes.func,
-  onEdit: PropTypes.func,
-  onDelete: PropTypes.func,
-}
+import { useState } from 'react'
+import PropTypes from 'prop-types'
+import Image from '../../assets/images'
+import { MobileVerticalDotsMajor } from '@shopify/polaris-icons'
+import ConfirmModal from '../../components/ConfirmModal'
 
 Table.defaultProps = {
   data: null,
@@ -37,31 +26,48 @@ Table.defaultProps = {
   onSearch: () => null,
 }
 
+Table.propTypes = {
+  data: PropTypes.object,
+  onEdit: PropTypes.func,
+  onDelete: PropTypes.func,
+  onChangePage: PropTypes.func,
+  onChangeLimit: PropTypes.func,
+  search: PropTypes.string,
+  onSearch: PropTypes.func,
+}
+
 function Table(props) {
   const { actions, data, onChangePage, onChangeLimit, search, onSearch, onEdit, onDelete } = props
   const { items, page, limit, totalPages, totalItems } = data || {}
 
   const [selected, setSelected] = useState(null)
   const [deleted, setDeleted] = useState(null)
-  
-  console.log(selected)
 
   let rows = []
   if (items?.length > 0) {
     rows = items.map((item, index) => [
       (page - 1) * limit + index + 1,
-      <h3>
-        <b>{item.name}</b>
-      </h3>,
+      <LegacyStack>
+        <Thumbnail
+          size="large"
+          source={item.thumbnail || Image.photo_placeholder}
+          alt={item.title}
+        />
+        <div><p>{item.title}</p></div>
+      </LegacyStack>,
+      <div>
+        <p>{item.description}</p>
+      </div>,
+      <div>
+        <p>{item.status}</p>
+      </div>,
       <LegacyStack distribution="trailing">
         <Popover
           active={item.id === selected?.id}
           activator={
             <Button
               plain
-              onClick={() => { 
-                setSelected(selected?.id === item.id ? null : item)
-              }}
+              onClick={() => setSelected(selected?.id === item.id ? null : item)}
               icon={MobileVerticalDotsMajor}
             />
           }
@@ -90,13 +96,13 @@ function Table(props) {
       <LegacyCard sectioned>
         <Search value={search} onChange={onSearch} />
       </LegacyCard>
-      
+
       <div>Total items: {totalItems || 'loading...'}</div>
 
-      <LegacyCard>
+      <LegacyCard >
         <DataTable
-          headings={['No.', 'Name', 'Actions']}
-          columnContentTypes={['text', 'text', 'numeric']}
+          headings={['No.', 'Thumbnail', 'Description', 'Status', 'Actions']}
+          columnContentTypes={['text', 'text', 'text', 'text', 'numeric']}
           rows={rows}
           footerContent={items ? (items?.length > 0 ? undefined : 'Have no data') : 'loading..'}
         />
@@ -111,9 +117,9 @@ function Table(props) {
               onNext={() => onChangePage(page + 1)}
             />
             <Select
-              options={[5, 10, 15, 100].map((item) => ({ label: '' + item, value: '' + item }))}
+              options={[10, 20, 50, 100].map((item) => ({ label: '' + item, value: '' + item }))}
               value={'' + limit}
-              onChange={(index) => {onChangeLimit(page, limit, index)}}
+              onChange={onChangeLimit}
             />
           </LegacyStack>
         </LegacyCard.Section>
@@ -140,5 +146,4 @@ function Table(props) {
     </LegacyStack>
   )
 }
-
 export default Table

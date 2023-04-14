@@ -47,6 +47,6 @@ const Model = PostgresSequelize.define('products', {
 
 Model.belongsTo(VendorModel)
 
-Model.sync({force: true})
+Model.sync({alter: true})
 
 export default Model

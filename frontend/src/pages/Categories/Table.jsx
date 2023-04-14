@@ -81,7 +81,7 @@ function Table(props) {
 
       <div>Total items: {totalItems || 'loading...'}</div>
 
-      <LegacyCard sectioned>
+      <LegacyCard>
         <DataTable
           columnContentTypes={['text', 'text', 'numeric']}
           headings={['No.', 'Name', 'Actions']}

@@ -21,6 +21,6 @@ Model.prototype.toJSON = function () {
   return values
 }
 
-Model.sync({force: true})
+Model.sync({alter: true})
 
 export default Model

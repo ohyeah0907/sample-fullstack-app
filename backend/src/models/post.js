@@ -43,6 +43,11 @@ const Model = PostgresSequelize.define('posts', {
 
 Model.belongsTo(CategoryModel)
 
-Model.sync({ force: true })
+Model.prototype.toJSON = function () {
+  let values = Object.assign({}, this.get())
+  return values
+}
+
+Model.sync({ alter: true })
 
 export default Model
