@@ -53,8 +53,10 @@ function Table(props) {
           source={item.thumbnail || Image.photo_placeholder}
           alt={item.title}
         />
-        <div><p>{item.title}</p></div>
       </LegacyStack>,
+      <div>
+        <p>{item.title}</p>
+      </div>,
       <div>
         <p>{item.description}</p>
       </div>,
@@ -99,10 +101,10 @@ function Table(props) {
 
       <div>Total items: {totalItems || 'loading...'}</div>
 
-      <LegacyCard >
+      <LegacyCard>
         <DataTable
-          headings={['No.', 'Thumbnail', 'Description', 'Status', 'Actions']}
-          columnContentTypes={['text', 'text', 'text', 'text', 'numeric']}
+          headings={['No.', 'Thumbnail', 'Title', 'Description', 'Status', 'Actions']}
+          columnContentTypes={['text', 'text', 'text', 'text', 'text', 'numeric']}
           rows={rows}
           footerContent={items ? (items?.length > 0 ? undefined : 'Have no data') : 'loading..'}
         />

@@ -26,7 +26,6 @@ function MyDropZoneSingle(props) {
   )
 
   const validImageTypes = ['image/gif', 'image/jpeg', 'image/png']
-
   const fileUpload = !file && <DropZone.FileUpload />
   const uploadedFile = file && (
     <LegacyStack>

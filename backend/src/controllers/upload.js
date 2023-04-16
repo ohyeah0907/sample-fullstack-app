@@ -11,7 +11,6 @@ export default {
       if (!fs.existsSync(filepath)) {
         throw new Error('File not found')
       }
-
       res.sendFile(filepath)
     } catch (error) {
       return ResponseHandler.error(res, error)

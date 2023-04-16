@@ -14,8 +14,8 @@ import countryRouter from './src/routes/country.js'
 import userRouter from './src/routes/user.js'
 import customerRouter from './src/routes/customer.js'
 import uploadRouter from './src/routes/upload.js'
-import categoryRouter from './src/routes/category.js';
-import postRouter from './src/routes/post.js';
+import categoryRouter from './src/routes/category.js'
+import postRouter from './src/routes/post.js'
 
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = path.dirname(__filename)
@@ -73,6 +73,6 @@ app.use(function (err, req, res, next) {
   res.render('error')
 })
 
-app.listen(PORT, () => console.log(`🚀 App listening on port ${process.env.HOST}`))
+app.listen(PORT, () => console.log(`🚀 App listening on port ${PORT}`))
 
 export default app

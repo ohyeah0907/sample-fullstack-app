@@ -14,12 +14,11 @@ function IndexPage(props) {
 
   const { page, limit, search } = qs.parse(props.location.search)
 
-  const getPosts = async ({page = 1, limit = 10, search = ''}) => {
+  const getPosts = async ({ page = 1, limit = 10, search = '' }) => {
     try {
       let query = qs.stringify({ page, limit, search })
       let res = await PostApi.find(query)
       if (!res.success) throw res.error
-      console.log(res.data)
       setPosts(res.data)
       setSearchParams({ page, limit, search })
     } catch (error) {
@@ -36,7 +35,7 @@ function IndexPage(props) {
 
       actions.showNotify({ message: 'Deleted' })
 
-      getPosts({page, limit, search})
+      getPosts({ page, limit, search })
     } catch (error) {
       console.log(error)
       actions.showNotify({ message: error.message, error: true })
@@ -46,7 +45,7 @@ function IndexPage(props) {
   }
   useEffect(() => {
     console.log(posts)
-    getPosts({page, limit, search})
+    getPosts({ page, limit, search })
   }, [])
 
   return (
@@ -61,7 +60,7 @@ function IndexPage(props) {
           },
         ]}
       />
-    <Table
+      <Table
         {...props}
         data={posts}
         onChangePage={(page) => getPosts({ page, limit, search })}
@@ -70,7 +69,6 @@ function IndexPage(props) {
         onEdit={(item) => props.navigate(`posts/${item.id}`)}
         onDelete={handleDelete}
       />
-
     </LegacyStack>
   )
 }

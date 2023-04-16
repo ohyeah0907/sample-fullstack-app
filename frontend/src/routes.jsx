@@ -13,6 +13,7 @@ import CategoryNew from './pages/Categories/new'
 import CategoryDetail from './pages/Categories/[id]'
 
 import Post from './pages/Posts'
+import PostDetail from './pages/Posts/[id]'
 
 export default [
   {
@@ -84,14 +85,23 @@ export default [
         title: 'Edit category',
         exact: true,
         component: CategoryDetail,
-        childrens: []
-      }
-    ]
-  }, {
+        childrens: [],
+      },
+    ],
+  },
+  {
     path: '/posts',
     title: 'Posts',
     exact: true,
     component: Post,
-    childrens: []
-  }
+    childrens: [
+      {
+        path: '/posts/:id',
+        title: 'Edit post',
+        exact: true,
+        component: PostDetail,
+        childrens: [],
+      },
+    ],
+  },
 ]
