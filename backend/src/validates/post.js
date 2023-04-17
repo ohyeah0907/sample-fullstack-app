@@ -24,7 +24,6 @@ export default {
         'images',
         'categoryId',
       ]).forEach((key) => (schema[key] = schemaDefine[key]))
-
       // // Thumbnail
       // req.body = req?.files['thumbnail']
       //   ? {

@@ -1,9 +1,10 @@
 import PropTypes from 'prop-types'
-import { Button, LegacyCard, LegacyStack } from '@shopify/polaris'
+import { Button, LegacyCard, LegacyStack, Thumbnail } from '@shopify/polaris'
 import { useEffect, useState } from 'react'
 import ValidateForm from '../../helpers/validateForm'
 import FormControl from '../../components/FormControl'
 import PostApi from '../../apis/post'
+import UploadApi from '../../apis/upload'
 
 const InitFormData = {
   title: {
@@ -68,6 +69,7 @@ const InitFormData = {
     type: 'file',
     label: 'Thumbnail',
     value: {},
+    originalValue: '',
     error: '',
     required: false,
     validate: {},
@@ -113,7 +115,7 @@ function CreateForm(props) {
         Array.from(['publish']).forEach(
           (field) => (_formData[field] = { ..._formData[field], value: Boolean(created[field]) })
         )
-        Array.from(['images']).foreach(
+        Array.from(['images']).forEach(
           (field) => (_formData[field] = { ..._formData[field], value: created[field] || [] })
         )
         // // Thumbnail
@@ -171,6 +173,33 @@ function CreateForm(props) {
     setFormData(_formData)
   }
   const handleDiscard = () => props.navigate('customers')
+
+  const handleSubmitThumbnail = async (name, value) => {
+    try{
+      if(!value) return;
+      console.log(value);
+      let _formData = {...formData}
+      _formData[name] = {..._formData[name], value: value}
+      
+      if(created.id) {
+        const res = await UploadApi.upload(value);
+        if(!res.success)
+          throw res.error;
+        console.log(res)
+        const resPost = await PostApi.update(created.id, res[0].url)
+        if(!resPost.success)
+          throw resPost.error
+      } else {
+        const res = await UploadApi.upload(value);
+        if(!res.success)
+          throw res.error;
+      }
+      
+    }catch(error) {
+      console.log(error)
+    }
+
+  }
 
   const handleSubmit = async () => {
     try {
@@ -248,10 +277,15 @@ function CreateForm(props) {
             </LegacyStack.Item>
           </LegacyStack>
           <LegacyStack distribution="fillEvenly">
+          <Thumbnail
+            size="small"
+            alt={formData['thumbnail'].name}
+            source={formData['thumbnail'].originalValue}
+          />
             <LegacyStack.Item fill>
               <FormControl
                 {...formData['thumbnail']}
-                onChange={(value) => handleChange('thumbnail', value)}
+                onChange={(value) => handleSubmitThumbnail('thumbnail', value)}
               />
             </LegacyStack.Item>
             <LegacyStack.Item fill></LegacyStack.Item>

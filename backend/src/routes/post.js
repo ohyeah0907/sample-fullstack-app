@@ -11,19 +11,11 @@ router.get('/', Controller.find)
 router.get('/:id', Controller.findById)
 router.post(
   '/',
-  MulterUpload.fields([
-    { name: 'thumbnail', maxCount: 1 },
-    { name: 'images', maxCount: 10 },
-  ]),
   Validate.create,
   Controller.create
 )
 router.post(
   '/:id',
-  MulterUpload.fields([
-    { name: 'thumbnail', maxCount: 1 },
-    { name: 'images', maxCount: 10 },
-  ]),
   Validate.update,
   Controller.update
 )
