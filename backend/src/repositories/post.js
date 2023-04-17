@@ -89,9 +89,9 @@ const create = async (data) => {
 }
 
 const update = async (id, data) => {
+  console.log(data)
   const updated = await Model.update(data, { where: { id }, returning: true })
-  console.log(updated)
-  return updated[1]
+  return updated
 }
 
 const _delete = async (id) => {

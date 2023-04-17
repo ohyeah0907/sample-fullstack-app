@@ -25,23 +25,23 @@ export default {
         'categoryId',
       ]).forEach((key) => (schema[key] = schemaDefine[key]))
 
-      // Thumbnail
-      req.body = req?.files['thumbnail']
-        ? {
-            ...req.body,
-            thumbnail: `${process.env.HOST}/api/uploads/${req?.files['thumbnail'][0].filename}`,
-          }
-        : { ...req.body }
+      // // Thumbnail
+      // req.body = req?.files['thumbnail']
+      //   ? {
+      //       ...req.body,
+      //       thumbnail: `${process.env.HOST}/api/uploads/${req?.files['thumbnail'][0].filename}`,
+      //     }
+      //   : { ...req.body }
 
-      // Images
-      req.body = req?.files['images']
-        ? {
-            ...req.body,
-            images: req.files['images'].map(
-              (file) => `${process.env.HOST}/api/uploads/${file.filename}`
-            ),
-          }
-        : { ...req.body }
+      // // Images
+      // req.body = req?.files['images']
+      //   ? {
+      //       ...req.body,
+      //       images: req.files['images'].map(
+      //         (file) => `${process.env.HOST}/api/uploads/${file.filename}`
+      //       ),
+      //     }
+      //   : { ...req.body }
 
       schema = Joi.object(schema)
 
@@ -55,28 +55,28 @@ export default {
 
   update: async (req, res, next) => {
     try {
-      console.log(req.files)
+      // console.log(req.files)
       let schema = {}
       Object.keys(req.body).forEach((key) => (schema[key] = schemaDefine[key]))
       Object.keys(req.files).forEach((key) => (schema[key] = schemaDefine[key]))
 
-      // Thumbnail
-      req.body = schema?.thumbnail
-        ? {
-            ...req.body,
-            thumbnail: `${process.env.HOST}/api/uploads/${req?.files['thumbnail'][0].filename}`,
-          }
-        : req.body
+      // // Thumbnail
+      // req.body = schema?.thumbnail
+      //   ? {
+      //       ...req.body,
+      //       thumbnail: `${process.env.HOST}/api/uploads/${req?.files['thumbnail'][0].filename}`,
+      //     }
+      //   : req.body
 
-      // Images
-      req.body = schema?.images
-        ? {
-            ...req.body,
-            images: req?.files['images'].map(
-              (file) => `${process.env.HOST}/api/uploads/${file.filename}`
-            ),
-          }
-        : req.body
+      // // Images
+      // req.body = schema?.images
+      //   ? {
+      //       ...req.body,
+      //       images: req?.files['images'].map(
+      //         (file) => `${process.env.HOST}/api/uploads/${file.filename}`
+      //       ),
+      //     }
+      //   : req.body
 
       schema = Joi.object(schema)
 

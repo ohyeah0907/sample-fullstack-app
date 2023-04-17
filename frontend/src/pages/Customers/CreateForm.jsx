@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react'
 import ValidateForm from '../../helpers/validateForm'
 import FormControl from '../../components/FormControl'
 import CustomerApi from '../../apis/customer'
+import UploadApi from '../../apis/upload'
 
 CreateForm.propTypes = {
   // ...appProps,
@@ -146,12 +147,23 @@ const InitFormData = {
       maxlength: [200, 'Too long!'],
     },
   },
+  avatar: {
+    name: 'avatar',
+    type: 'file',
+    label: 'Avatar',
+    value: null,
+    originValue: '',
+    error: '',
+    required: false,
+    validate: {},
+  },
 }
 
 function CreateForm(props) {
   const { actions, created, countries } = props
 
   const [formData, setFormData] = useState(null)
+  console.log('formData :>> ', formData);
 
   useEffect(() => console.log('formData :>> ', formData), [formData])
 
@@ -168,6 +180,10 @@ function CreateForm(props) {
       Array.from(['countryId']).forEach(
         (field) => (_formData[field] = { ..._formData[field], value: String(created[field]) })
       )
+      
+      Array.from(['avatar']).forEach(
+        (field) => (_formData[field] = { ..._formData[field], originValue: String(created[field]) })
+      )
 
       _formData['password'].disabled = true
       _formData['passwordConfirm'].disabled = true
@@ -183,6 +199,8 @@ function CreateForm(props) {
     }
 
     setFormData(_formData)
+
+    return () => {}
   }, [])
 
   const handleChange = (name, value) => {
@@ -251,6 +269,37 @@ function CreateForm(props) {
       actions.hideAppLoading()
     }
   }
+
+  const handleSubmitAvatar = async (name, value) => {
+    console.log('handleSubmitAvatar');
+    console.log('value :>> ', value);
+    try {
+      if (!value ) return 
+
+      let _formData = {...formData}
+      _formData[name] = { ..._formData[name], value, error: '' }
+      setFormData(_formData)
+
+      // update file to cloud
+      let res = await UploadApi.upload([_formData[name].value])
+      console.log('res :>> ', res);
+      if (!res.success) throw res.error
+
+      _formData = {...formData}
+      _formData['avatar'] = { ..._formData['avatar'], originValue: res.data[0].url }
+      setFormData(_formData)
+
+      // update
+      res = await CustomerApi.update(created.id, {avatar: res.data[0].url})
+      console.log('res :>> ', res);
+      if (!res.success) throw res.error
+
+    } catch (error) {
+      console.log(error)
+      actions.showNotify({ error: true, message: error.message })
+    }
+  }
+
 
   if (!formData) return null
 
@@ -333,6 +382,22 @@ function CreateForm(props) {
                 onChange={(value) => handleChange('countryId', value)}
                 options={countryOptions}
               />
+            </LegacyStack.Item>
+            <LegacyStack.Item fill></LegacyStack.Item>
+          </LegacyStack>
+          <LegacyStack distribution="fillEvenly">
+            <LegacyStack.Item fill>
+            <LegacyStack distribution="fillEvenly">
+              <LegacyStack.Item fill>
+                {formData['avatar'].originValue && (<img alt="" src={formData['avatar'].originValue} style={{width: 100, height: 100, borderRadius: 5, border: '1px solid #dddddd', objectFit: 'cover'}} />)}
+              </LegacyStack.Item>
+              <LegacyStack.Item fill>
+                <FormControl
+                  {...formData['avatar']}
+                  onChange={(value) => handleSubmitAvatar('avatar', value)}
+                />
+              </LegacyStack.Item>
+          </LegacyStack>
             </LegacyStack.Item>
             <LegacyStack.Item fill></LegacyStack.Item>
           </LegacyStack>

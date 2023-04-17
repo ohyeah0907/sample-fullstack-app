@@ -14,6 +14,8 @@ import CategoryDetail from './pages/Categories/[id]'
 
 import Post from './pages/Posts'
 import PostDetail from './pages/Posts/[id]'
+import PostNew from './pages/Posts/new'
+
 
 export default [
   {
@@ -100,6 +102,13 @@ export default [
         title: 'Edit post',
         exact: true,
         component: PostDetail,
+        childrens: [],
+      },
+      {
+        path: '/posts/new',
+        title: 'New post',
+        exact: true,
+        component: PostNew,
         childrens: [],
       },
     ],

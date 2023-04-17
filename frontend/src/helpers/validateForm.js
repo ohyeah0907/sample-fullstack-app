@@ -4,7 +4,7 @@
  * @returns Object
  */
 const validateField = (fieldData) => {
-  let _fieldData = fieldData ? JSON.parse(JSON.stringify(fieldData)) : {}
+  let _fieldData = fieldData ? {...fieldData} : {}
   let fieldValid = true
 
   try {
@@ -83,7 +83,7 @@ const validateField = (fieldData) => {
  * @returns Object
  */
 const validateForm = (formData) => {
-  let _formData = formData ? JSON.parse(JSON.stringify(formData)) : {}
+  let _formData = formData ? {...formData} : {}
   let formValid = true
 
   try {

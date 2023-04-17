@@ -3,6 +3,7 @@ import { Button, LegacyCard, LegacyStack } from '@shopify/polaris'
 import { useEffect, useState } from 'react'
 import ValidateForm from '../../helpers/validateForm'
 import FormControl from '../../components/FormControl'
+import PostApi from '../../apis/post'
 
 const InitFormData = {
   title: {
@@ -39,7 +40,7 @@ const InitFormData = {
     name: 'publish',
     type: 'radio',
     label: 'Publish',
-    value: '',
+    value: true,
     error: '',
     required: false,
     validate: {},
@@ -66,10 +67,7 @@ const InitFormData = {
     name: 'thumbnail',
     type: 'file',
     label: 'Thumbnail',
-    value: {
-      name: '',
-      type: '',
-    },
+    value: {},
     error: '',
     required: false,
     validate: {},
@@ -88,7 +86,7 @@ const InitFormData = {
     name: 'categoryId',
     type: 'text',
     label: 'CategoryId',
-    value: [],
+    value: '',
     error: '',
     required: false,
     validate: {},
@@ -97,91 +95,128 @@ const InitFormData = {
 }
 
 function CreateForm(props) {
-  const { actions, created, countries } = props
+  const { actions, created } = props
   const [formData, setFormData] = useState(null)
-  const [test, setTest] = useState(null)
 
   useEffect(() => {
     console.log('formData :>> ', formData)
   }, [formData])
 
   useEffect(() => {
-    const fillData = async () => {
-      let _formData = JSON.parse(JSON.stringify(InitFormData))
+    const fillFileData = async () => {
+      let _formData = {...InitFormData}
 
       if (created.id) {
-        Array.from(['title', 'description', 'status', 'categoryId']).forEach(
+        Array.from(['title', 'description', 'status', 'categoryId', 'thumbnail']).forEach(
           (field) => (_formData[field] = { ..._formData[field], value: created[field] || '' })
         )
         Array.from(['publish']).forEach(
           (field) => (_formData[field] = { ..._formData[field], value: Boolean(created[field]) })
         )
-        // Thumbnail
-        let filename = created['thumbnail']
-          ? created['thumbnail'].substring(
-              created['thumbnail'].lastIndexOf('/') + 1,
-              created['thumbnail'].lastIndexOf('.')
-            )
-          : ''
-        let file =
-          !created['thumbnail'] == ''
-            ? await (await fetch(created['thumbnail']))
-                .blob()
-                .then((blob) => new File([blob.arrayBuffer()], filename, { type: blob.type }))
-            : null
-        _formData['thumbnail'].value = file
-        console.log(_formData['thumbnail'])
+        Array.from(['images']).foreach(
+          (field) => (_formData[field] = { ..._formData[field], value: created[field] || [] })
+        )
+        // // Thumbnail
+        // let filename = created['thumbnail']
+        //   ? created['thumbnail'].substring(
+        //       created['thumbnail'].lastIndexOf('/') + 1,
+        //       created['thumbnail'].length
+        //     )
+        //   : ''
+        // let file =
+        //   !created['thumbnail'] == ''
+        //     ? await (await fetch(created['thumbnail']))
+        //         .blob()
+        //         .then((blob) => new File([blob], filename, { type: blob.type }))
+        //     : null
+        // _formData['thumbnail'].value = file
 
-        // Images
-        let filenames =
-          created['images'] != []
-            ? created['images'].map((filePath) =>
-                filePath.substring(filePath.lastIndexOf('/') + 1, filePath.lastIndexOf('.'))
-              )
-            : []
-        let files =
-          created['images'] != []
-            ? await Promise.all(
-                created['images'].map(async (filePath, index) => {
-                  return (await fetch(filePath))
-                    .blob()
-                    .then(
-                      (blob) =>
-                        new File([blob.arrayBuffer()], filenames[index], { type: blob.type })
-                    )
-                })
-              )
-            : []
-        _formData['images'].value = files
-
-        console.log(_formData)
+        // // Images
+        // let filenames =
+        //   created['images'] != []
+        //     ? created['images'].map((filePath) =>
+        //         filePath.substring(filePath.lastIndexOf('/') + 1, filePath.length)
+        //       )
+        //     : []
+        // let files =
+        //   created['images'] != []
+        //     ? await Promise.all(
+        //         created['images'].map(async (filePath, index) => {
+        //           return (await fetch(filePath))
+        //             .blob()
+        //             .then((blob) => new File([blob], filenames[index], { type: blob.type }))
+        //         })
+        //       )
+        //     : []
+        // _formData['images'].value = files
+      
       } else {
         // example data
+        _formData['title'].value = 'Title',
+        _formData['description'].value = 'Description',
+        _formData['status'].value = 'DRAFT',
+        _formData['publish'].value = false
+        _formData['thumbnail'].value = {}
+        _formData['images'].value = []
       }
-      let test = await fetch(created['thumbnail'])
-      let image = await test.blob()
-      console.log(image)
-      console.log(URL.createObjectURL(image))
-      setTest(test)
+      console.log("In useEffect");
       setFormData(_formData)
     }
-    fillData()
+    fillFileData()
   }, [])
 
   const handleChange = (name, value) => {
-    let _formData = JSON.parse(JSON.stringify(formData))
+    let _formData = {...formData}
     _formData[name] = { ..._formData[name], value, error: '' }
     setFormData(_formData)
   }
   const handleDiscard = () => props.navigate('customers')
 
-  const handleSubmit = async () => {}
+  const handleSubmit = async () => {
+    try {
+      const { formValid, validFormData } = ValidateForm.validateForm(formData)
+      console.log('validFormData :>> ', validFormData);
+      if (!formValid) {
+        setFormData(validFormData)
+        throw new Error('Invalid form data')
+      }
+
+      actions.showAppLoading()
+      let data = {
+        title: validFormData.title.value,
+        description: validFormData.description.value,
+        publish: validFormData.publish.value,
+        status: validFormData.status.value,
+        thumbnail: validFormData.thumbnail.value,
+        images: validFormData.images.value,
+        categoryId: validFormData.categoryId.value
+      }
+
+      let res = null
+      if (created.id) {
+        // update
+        res = await PostApi.update(created.id, data)
+      } else {
+        // create
+        res = await PostApi.create(data)
+      }
+      if (!res.success) throw res.error
+
+      actions.showNotify({ message: created.id ? 'Saved' : 'Created' })
+
+      props.navigate(`posts/${res.data.id}`)
+    } catch (error) {
+      console.log(error)
+      actions.showNotify({ error: true, message: error.message })
+    } finally {
+      actions.hideAppLoading()
+    }
+  }
 
   if (!formData) return null
 
   return (
     <LegacyStack vertical alignment="fill">
-      <img src={test} />
       <LegacyCard sectioned>
         <LegacyStack vertical alignment="fill" spacing="extraLoose">
           <LegacyStack distribution="fillEvenly">

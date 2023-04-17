@@ -18,23 +18,23 @@ const schemaDefine = {
 export default {
   create: async (req, res, next) => {
     try {
-      let schema = {}
-      Array.from([
-        'firstName',
-        'lastName',
-        'email',
-        'phone',
-        'username',
-        'password',
-        'gender',
-        'birthday',
-        'avatar',
-        'photos',
-        'countryId',
-      ]).forEach((key) => (schema[key] = schemaDefine[key]))
-      schema = Joi.object(schema)
+    //   let schema = {}
+    //   Array.from([
+    //     'firstName',
+    //     'lastName',
+    //     'email',
+    //     'phone',
+    //     'username',
+    //     'password',
+    //     'gender',
+    //     'birthday',
+    //     'avatar',
+    //     'photos',
+    //     'countryId',
+    //   ]).forEach((key) => (schema[key] = schemaDefine[key]))
+    //   schema = Joi.object(schema)
 
-      await schema.validateAsync(req.body)
+    //   await schema.validateAsync(req.body)
 
       next()
     } catch (error) {
@@ -44,22 +44,22 @@ export default {
 
   update: async (req, res, next) => {
     try {
-      let schema = {}
-      Array.from([
-        'firstName',
-        'lastName',
-        'email',
-        'phone',
-        'username',
-        'gender',
-        'birthday',
-        'avatar',
-        'photos',
-        'countryId',
-      ]).forEach((key) => (schema[key] = schemaDefine[key]))
-      schema = Joi.object(schema)
+      // let schema = {}
+      // Array.from([
+      //   'firstName',
+      //   'lastName',
+      //   'email',
+      //   'phone',
+      //   'username',
+      //   'gender',
+      //   'birthday',
+      //   'avatar',
+      //   'photos',
+      //   'countryId',
+      // ]).forEach((key) => (schema[key] = schemaDefine[key]))
+      // schema = Joi.object(schema)
 
-      await schema.validateAsync(req.body)
+      // await schema.validateAsync(req.body)
 
       next()
     } catch (error) {
