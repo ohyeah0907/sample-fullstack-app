@@ -63,6 +63,7 @@ export default {
   update: async (req, res) => {
     try {
       const { id } = req.params
+      console.log('req.body :>> ', req.body);
       const data = await Post.update(id, req.body)
 
       return ResponseHandler.success(res, data)

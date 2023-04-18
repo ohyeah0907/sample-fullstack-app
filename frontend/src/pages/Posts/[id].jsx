@@ -23,6 +23,7 @@ function DetailPage(props) {
     }
   }
   useEffect(() => {
+    console.log("Inside [id]");
     getPost()
   }, [])
 

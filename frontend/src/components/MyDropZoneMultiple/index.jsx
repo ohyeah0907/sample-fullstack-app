@@ -17,11 +17,13 @@ function MyDropZoneMultiple(props) {
   const { onChange } = props
 
   const [files, setFiles] = useState(props.files || [])
-
-  useEffect(() => onChange(files), [files])
+  console.log('files :>> ', files)
+  useEffect(() => {
+    onChange(files)
+  }, [files])
 
   const handleDropZoneDrop = useCallback((_dropFiles, acceptedFiles, _rejectedFiles) => {
-    setFiles((files) => [...files, ...acceptedFiles])
+    setFiles([...acceptedFiles])
   }, [])
 
   const validImageTypes = ['image/gif', 'image/jpeg', 'image/png']

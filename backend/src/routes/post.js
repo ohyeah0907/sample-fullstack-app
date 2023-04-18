@@ -14,7 +14,7 @@ router.post(
   Validate.create,
   Controller.create
 )
-router.post(
+router.put(
   '/:id',
   Validate.update,
   Controller.update

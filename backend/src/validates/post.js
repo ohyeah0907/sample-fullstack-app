@@ -6,13 +6,14 @@ const schemaDefine = {
   description: Joi.string().trim().required().min(1).max(50),
   publish: Joi.boolean(),
   status: Joi.string(),
-  thumbnail: Joi.string(),
+  thumbnail: Joi.any(),
   images: Joi.array().items(Joi.string()),
   categoryId: Joi.number().required(),
 }
 
 export default {
   create: async (req, res, next) => {
+    console.log('req.body :>> ', req.body);
     try {
       let schema = {}
       Array.from([
@@ -53,11 +54,10 @@ export default {
   },
 
   update: async (req, res, next) => {
+    console.log(req.body)
     try {
-      // console.log(req.files)
       let schema = {}
       Object.keys(req.body).forEach((key) => (schema[key] = schemaDefine[key]))
-      Object.keys(req.files).forEach((key) => (schema[key] = schemaDefine[key]))
 
       // // Thumbnail
       // req.body = schema?.thumbnail

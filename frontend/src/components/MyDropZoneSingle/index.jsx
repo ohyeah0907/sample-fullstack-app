@@ -4,7 +4,7 @@ import { NoteMinor } from '@shopify/polaris-icons'
 import { useState, useCallback, useEffect } from 'react'
 
 MyDropZoneSingle.propTypes = {
-  file: PropTypes.object,
+  // file: PropTypes.object,
   onChange: PropTypes.func,
 }
 

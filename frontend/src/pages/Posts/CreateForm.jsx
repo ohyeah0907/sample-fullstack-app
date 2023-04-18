@@ -1,10 +1,12 @@
 import PropTypes from 'prop-types'
-import { Button, LegacyCard, LegacyStack, Thumbnail } from '@shopify/polaris'
+import { Button, Checkbox, LegacyCard, LegacyStack, Scrollable, Thumbnail } from '@shopify/polaris'
 import { useEffect, useState } from 'react'
 import ValidateForm from '../../helpers/validateForm'
 import FormControl from '../../components/FormControl'
 import PostApi from '../../apis/post'
 import UploadApi from '../../apis/upload'
+import { NoteMinor } from '@shopify/polaris-icons'
+import ImageView from './ImageView'
 
 const InitFormData = {
   title: {
@@ -35,7 +37,6 @@ const InitFormData = {
       minlength: [2, 'Too short!'],
       maxlength: [200, 'Too long'],
     },
-    focused: true,
   },
   publish: {
     name: 'publish',
@@ -68,8 +69,9 @@ const InitFormData = {
     name: 'thumbnail',
     type: 'file',
     label: 'Thumbnail',
-    value: {},
+    value: null,
     originalValue: '',
+    droppedValue: '',
     error: '',
     required: false,
     validate: {},
@@ -79,6 +81,8 @@ const InitFormData = {
     type: 'file',
     label: 'Images',
     value: [],
+    originalValue: [],
+    droppedValue: '',
     error: '',
     required: false,
     validate: {},
@@ -99,112 +103,85 @@ const InitFormData = {
 function CreateForm(props) {
   const { actions, created } = props
   const [formData, setFormData] = useState(null)
+  const [droppedThumbnail, setDroppedThumnail] = useState(false)
+  const [droppedImages, setDroppedImages] = useState([])
 
   useEffect(() => {
     console.log('formData :>> ', formData)
   }, [formData])
 
   useEffect(() => {
+    console.log('droppedImages :>> ', droppedImages)
+  }, [droppedImages])
+
+  useEffect(() => {
     const fillFileData = async () => {
-      let _formData = {...InitFormData}
+      let _formData = { ...InitFormData }
 
       if (created.id) {
-        Array.from(['title', 'description', 'status', 'categoryId', 'thumbnail']).forEach(
+        Array.from(['title', 'description', 'status', 'categoryId']).forEach(
           (field) => (_formData[field] = { ..._formData[field], value: created[field] || '' })
         )
         Array.from(['publish']).forEach(
           (field) => (_formData[field] = { ..._formData[field], value: Boolean(created[field]) })
         )
         Array.from(['images']).forEach(
-          (field) => (_formData[field] = { ..._formData[field], value: created[field] || [] })
+          (field) =>
+            (_formData[field] = { ..._formData[field], originalValue: created[field] || [] })
         )
-        // // Thumbnail
-        // let filename = created['thumbnail']
-        //   ? created['thumbnail'].substring(
-        //       created['thumbnail'].lastIndexOf('/') + 1,
-        //       created['thumbnail'].length
-        //     )
-        //   : ''
-        // let file =
-        //   !created['thumbnail'] == ''
-        //     ? await (await fetch(created['thumbnail']))
-        //         .blob()
-        //         .then((blob) => new File([blob], filename, { type: blob.type }))
-        //     : null
-        // _formData['thumbnail'].value = file
-
-        // // Images
-        // let filenames =
-        //   created['images'] != []
-        //     ? created['images'].map((filePath) =>
-        //         filePath.substring(filePath.lastIndexOf('/') + 1, filePath.length)
-        //       )
-        //     : []
-        // let files =
-        //   created['images'] != []
-        //     ? await Promise.all(
-        //         created['images'].map(async (filePath, index) => {
-        //           return (await fetch(filePath))
-        //             .blob()
-        //             .then((blob) => new File([blob], filenames[index], { type: blob.type }))
-        //         })
-        //       )
-        //     : []
-        // _formData['images'].value = files
-      
+        Array.from(['thumbnail']).forEach(
+          (field) =>
+            (_formData[field] = { ..._formData[field], originalValue: created[field || ''] })
+        )
       } else {
         // example data
-        _formData['title'].value = 'Title',
-        _formData['description'].value = 'Description',
-        _formData['status'].value = 'DRAFT',
+        _formData['title'].value = 'Title'
+        _formData['description'].value = 'Description'
+        _formData['status'].value = 'DRAFT'
         _formData['publish'].value = false
         _formData['thumbnail'].value = {}
         _formData['images'].value = []
       }
-      console.log("In useEffect");
       setFormData(_formData)
     }
     fillFileData()
   }, [])
 
   const handleChange = (name, value) => {
-    let _formData = {...formData}
+    let _formData = { ...formData }
     _formData[name] = { ..._formData[name], value, error: '' }
     setFormData(_formData)
   }
   const handleDiscard = () => props.navigate('customers')
 
-  const handleSubmitThumbnail = async (name, value) => {
-    try{
-      if(!value) return;
-      console.log(value);
-      let _formData = {...formData}
-      _formData[name] = {..._formData[name], value: value}
-      
-      if(created.id) {
-        const res = await UploadApi.upload(value);
-        if(!res.success)
-          throw res.error;
-        console.log(res)
-        const resPost = await PostApi.update(created.id, res[0].url)
-        if(!resPost.success)
-          throw resPost.error
+  const handleSubmitFile = async (name, value) => {
+    try {
+      if (value == {} || value == []) return
+
+      let _formData = { ...formData }
+      const res = await UploadApi.upload(value?.length ? value : [value])
+
+      if (!res.success) throw res.error
+
+      if (name == 'thumbnail') {
+        _formData[name] = { ..._formData[name], originalValue: res.data[0]?.url }
       } else {
-        const res = await UploadApi.upload(value);
-        if(!res.success)
-          throw res.error;
+        _formData[name] = {
+          ..._formData[name],
+          value: [],
+          originalValue: _formData[name].originalValue.concat(res.data.map((item) => item?.url)),
+        }
       }
-      
-    }catch(error) {
+
+      setFormData(_formData)
+    } catch (error) {
       console.log(error)
     }
-
   }
 
   const handleSubmit = async () => {
     try {
       const { formValid, validFormData } = ValidateForm.validateForm(formData)
-      console.log('validFormData :>> ', validFormData);
       if (!formValid) {
         setFormData(validFormData)
         throw new Error('Invalid form data')
@@ -216,11 +193,12 @@ function CreateForm(props) {
         description: validFormData.description.value,
         publish: validFormData.publish.value,
         status: validFormData.status.value,
-        thumbnail: validFormData.thumbnail.value,
-        images: validFormData.images.value,
-        categoryId: validFormData.categoryId.value
+        thumbnail: droppedThumbnail ? '' : validFormData.thumbnail.originalValue,
+        images: validFormData.images.originalValue.filter(
+          (image, index) => !droppedImages.includes('' + index)
+        ),
+        categoryId: validFormData.categoryId.value,
       }
-
       let res = null
       if (created.id) {
         // update
@@ -233,7 +211,7 @@ function CreateForm(props) {
 
       actions.showNotify({ message: created.id ? 'Saved' : 'Created' })
 
-      props.navigate(`posts/${res.data.id}`)
+      props.navigate(`posts`)
     } catch (error) {
       console.log(error)
       actions.showNotify({ error: true, message: error.message })
@@ -276,28 +254,57 @@ function CreateForm(props) {
               />
             </LegacyStack.Item>
           </LegacyStack>
-          <LegacyStack distribution="fillEvenly">
-          <Thumbnail
-            size="small"
-            alt={formData['thumbnail'].name}
-            source={formData['thumbnail'].originalValue}
-          />
-            <LegacyStack.Item fill>
-              <FormControl
-                {...formData['thumbnail']}
-                onChange={(value) => handleSubmitThumbnail('thumbnail', value)}
-              />
-            </LegacyStack.Item>
-            <LegacyStack.Item fill></LegacyStack.Item>
+
+          <LegacyStack>
+            <div>
+              <p>{formData['thumbnail'].label}</p>
+              <LegacyStack>
+                {formData['thumbnail'].originalValue && (
+                  <ImageView
+                    src={formData['thumbnail'].originalValue}
+                    checked={droppedThumbnail}
+                    onChange={(e) => setDroppedThumnail((prev) => !prev)}
+                  />
+                )}
+                <FormControl
+                  {...formData['thumbnail']}
+                  label=""
+                  onChange={(value) => handleSubmitFile('thumbnail', value)}
+                />
+              </LegacyStack>
+            </div>
           </LegacyStack>
-          <LegacyStack distribution="fillEvenly">
-            <LegacyStack.Item fill>
-              <FormControl
-                {...formData['images']}
-                onChange={(value) => handleChange('images', value)}
-              />
-            </LegacyStack.Item>
+
+          <LegacyStack>
+            <div>
+              <p>{formData['images'].label}</p>
+              <LegacyStack wrap={true}>
+                {formData['images'].originalValue.length &&
+                  formData['images'].originalValue.map((image, index) => (
+                    <ImageView
+                      key={index}
+                      src={image}
+                      checked={droppedImages.includes(index)}
+                      onChange={(event) => {
+                        let _droppedImages = [...droppedImages]
+                        if (_droppedImages.includes(index)) {
+                          _droppedImages = _droppedImages.filter((_item) => _item != index)
+                        } else {
+                          _droppedImages.push(index)
+                        }
+                        setDroppedImages(_droppedImages)
+                      }}
+                    />
+                  ))}
+                <FormControl
+                  {...formData['images']}
+                  label=""
+                  onChange={(value) => handleSubmitFile('images', value)}
+                />
+              </LegacyStack>
+            </div>
           </LegacyStack>
+
           <LegacyStack distribution="fillEvenly">
             <LegacyStack.Item fill>
               <FormControl
